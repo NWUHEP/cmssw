@@ -59,19 +59,19 @@ ntuple_triggercells = cms.PSet(
     eeSimHits = cms.InputTag('g4SimHits:HGCHitsEE'),
     fhSimHits = cms.InputTag('g4SimHits:HGCHitsHEfront'),
     bhSimHits = cms.InputTag('g4SimHits:HcalHits'),
-    FillSimEnergy = cms.bool(False),
+    FillSimEnergy = cms.bool(True),
     fcPerMip = fcPerMip,
     keV2fC = keV2fC,
     layerWeights = layerWeights,
     thicknessCorrections = thicknessCorrections,
-    FilterCellsInMulticlusters = cms.bool(False)
+    FilterCellsInMulticlusters = cms.bool(True)
 )
 
 ntuple_clusters = cms.PSet(
     NtupleName = cms.string('HGCalTriggerNtupleHGCClusters'),
     Clusters = cms.InputTag('hgcalBackEndLayer1Producer:HGCalBackendLayer1Processor2DClustering'),
     Multiclusters = cms.InputTag('hgcalBackEndLayer2Producer:HGCalBackendLayer2Processor3DClustering'),
-    FilterClustersInMulticlusters = cms.bool(False)
+    FilterClustersInMulticlusters = cms.bool(True)
 )
 
 from L1Trigger.L1THGCal.egammaIdentification import egamma_identification_drnn_cone
@@ -98,7 +98,7 @@ hgcalTriggerNtuplizer = cms.EDAnalyzer(
         ntuple_gen,
         ntuple_genjet,
         ntuple_gentau,
-        ntuple_digis,
+        #ntuple_digis,
         ntuple_triggercells,
         ntuple_clusters,
         ntuple_multicluster,

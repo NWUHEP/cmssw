@@ -3,8 +3,8 @@ from Configuration.StandardSequences.Eras import eras
 from Configuration.ProcessModifiers.convertHGCalDigisSim_cff import convertHGCalDigisSim
 
 # For old samples use the digi converter
-#process = cms.Process('DIGI',eras.Phase2,convertHGCalDigisSim)
-process = cms.Process('DIGI',eras.Phase2)
+process = cms.Process('DIGI',eras.Phase2,convertHGCalDigisSim)
+#process = cms.Process('DIGI',eras.Phase2)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -27,12 +27,15 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(50)
+    input = cms.untracked.int32(10)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-       fileNames = cms.untracked.vstring('/store/relval/CMSSW_10_4_0_pre2/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/103X_upgrade2023_realistic_v2_2023D21noPU-v1/20000/F4344045-AEDE-4240-B7B1-27D2CF96C34E.root'),
+       #fileNames = cms.untracked.vstring('/store/relval/CMSSW_10_4_0_pre2/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/103X_upgrade2023_realistic_v2_2023D21noPU-v1/20000/F4344045-AEDE-4240-B7B1-27D2CF96C34E.root'),
+       #fileNames = cms.untracked.vstring('/store/mc/PhaseIIFall17D/SingleE_FlatPt-2to100/GEN-SIM-DIGI-RAW/L1TPU200_93X_upgrade2023_realistic_v5-v1/80000/FEEE84F9-EA37-E811-B2E7-141877638819.root'),
+       fileNames = cms.untracked.vstring('/store/mc/PhaseIIFall17D/SinglePhoton_FlatPt-8to150/GEN-SIM-DIGI-RAW/L1TnoPU_93X_upgrade2023_realistic_v5-v1/30000/D29274B9-1C39-E811-B63E-0CC47A4DEE1C.root'),
+       #eventsToProcess = cms.untracked.VEventRange('1:82:74727'),
        inputCommands=cms.untracked.vstring(
            'keep *',
            'drop l1tEMTFHit2016Extras_simEmtfDigis_CSC_HLT',
@@ -54,6 +57,11 @@ process.configurationMetadata = cms.untracked.PSet(
     name = cms.untracked.string('Applications')
 )
 
+# Output definition
+process.TFileService = cms.Service(
+    "TFileService",
+    fileName = cms.string("ntuple.root")
+    )
 process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
@@ -72,15 +80,24 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 process.load('L1Trigger.L1THGCal.hgcalTriggerPrimitives_cff')
 process.hgcl1tpg_step = cms.Path(process.hgcalTriggerPrimitives)
 
+# use super trigger cells
+#from L1Trigger.L1THGCal.customTriggerCellSelect import custom_triggercellselect_supertriggercell
+#custom_triggercellselect_supertriggercell(process)
+
 # Change to V7 trigger geometry for older samples
 #  from L1Trigger.L1THGCal.customTriggerGeometry import custom_geometry_ZoltanSplit_V7
 #  process = custom_geometry_ZoltanSplit_V7(process)
+
+# load ntuplizer
+process.load('L1Trigger.L1THGCalUtilities.hgcalTriggerNtuples_cff')
+process.ntuple_step = cms.Path(process.hgcalTriggerNtuples)
 
 
 process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.hgcl1tpg_step, process.FEVTDEBUGoutput_step)
+#process.schedule = cms.Schedule(process.hgcl1tpg_step, process.FEVTDEBUGoutput_step)
+process.schedule = cms.Schedule(process.hgcl1tpg_step, process.ntuple_step)
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete

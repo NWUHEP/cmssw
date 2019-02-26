@@ -30,5 +30,6 @@ be_proc = cms.PSet( ProcessorName  = cms.string('HGCalBackendLayer2Processor3DCl
 hgcalBackEndLayer2Producer = cms.EDProducer(
     "HGCalBackendLayer2Producer",
     InputCluster = cms.InputTag('hgcalBackEndLayer1Producer:HGCalBackendLayer1Processor2DClustering'),
+    GenParticles = cms.InputTag('genParticles'), # Bueghly
     ProcessorParameters = be_proc.clone()
     )
